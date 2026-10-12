@@ -3,13 +3,11 @@ const router = express.Router();
 const pool = require('../db/pool');
 const { authMiddleware } = require('../middleware/auth');
 
-// GET /api/sync — cargar todos los datos del usuario
+// GET /api/sync — cargar todos los datos compartidos de la empresa
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
     const result = await pool.query(
-      'SELECT clave, valor FROM user_data WHERE usuario_id = $1',
-      [userId]
+      'SELECT clave, valor FROM shared_data ORDER BY actualizado_en DESC'
     );
     const data = {};
     result.rows.forEach(row => {
@@ -22,20 +20,18 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
-// PUT /api/sync/:key — guardar un dato del usuario
+// PUT /api/sync/:key — guardar un dato compartido
 router.put('/:key', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
     const key = req.params.key;
     const value = JSON.stringify(req.body.value);
 
-    // Upsert: insertar o actualizar
     await pool.query(`
-      INSERT INTO user_data (usuario_id, clave, valor, actualizado_en)
-      VALUES ($1, $2, $3, NOW())
-      ON CONFLICT (usuario_id, clave)
-      DO UPDATE SET valor = $3, actualizado_en = NOW()
-    `, [userId, key, value]);
+      INSERT INTO shared_data (clave, valor, actualizado_en)
+      VALUES ($1, $2, NOW())
+      ON CONFLICT (clave)
+      DO UPDATE SET valor = $2, actualizado_en = NOW()
+    `, [key, value]);
 
     res.json({ ok: true });
   } catch(err) {
