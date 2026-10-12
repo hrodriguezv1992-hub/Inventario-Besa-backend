@@ -22,6 +22,7 @@ app.use('/api/ordenes',      require('./routes/ordenes'));
 app.use('/api/usuarios',     require('./routes/usuarios'));
 app.use('/api/equivalencias',require('./routes/equivalencias'));
 app.use('/api/log',          require('./routes/log'));
+app.use('/api/sync',         require('./routes/sync'));
 
 // Health check
 app.get('/health', async (req, res) => {
