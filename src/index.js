@@ -47,4 +47,8 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`✅ InventaPro API corriendo en puerto ${PORT}`);
   console.log(`   Health: http://localhost:${PORT}/health`);
+  // Diagnóstico de variables de entorno
+  const dbUrl = process.env.SUPABASE_URL || process.env.DATABASE_URL || '(no definida)';
+  const dbHost = dbUrl.includes('@') ? dbUrl.split('@')[1].split('/')[0] : dbUrl;
+  console.log(`   DB host: ${dbHost}`);
 });

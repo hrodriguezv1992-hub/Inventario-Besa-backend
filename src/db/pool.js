@@ -1,8 +1,10 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+const SUPABASE_FALLBACK = 'postgresql://postgres:Intermilan10!!@db.dzjepcbatqosghrfgbkn.supabase.co:5432/postgres';
+
 const pool = new Pool({
-  connectionString: process.env.SUPABASE_URL || process.env.DATABASE_URL,
+  connectionString: process.env.SUPABASE_URL || process.env.DATABASE_URL || SUPABASE_FALLBACK,
   ssl: { rejectUnauthorized: false }
 });
 
