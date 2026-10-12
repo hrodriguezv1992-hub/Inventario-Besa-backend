@@ -1,10 +1,9 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-const SUPABASE_FALLBACK = 'postgresql://postgres:Intermilan10!!@db.dzjepcbatqosghrfgbkn.supabase.co:5432/postgres';
-
+// IMPORTANTE: usar SUPABASE_URL (no DATABASE_URL, que Railway sobreescribe internamente)
 const pool = new Pool({
-  connectionString: process.env.SUPABASE_URL || process.env.DATABASE_URL || SUPABASE_FALLBACK,
+  connectionString: process.env.SUPABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 
