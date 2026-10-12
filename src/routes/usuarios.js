@@ -41,20 +41,29 @@ router.post('/', authMiddleware, adminOnly, async (req, res) => {
 // PUT /api/usuarios/:id
 router.put('/:id', authMiddleware, adminOnly, async (req, res) => {
   const { id } = req.params;
-  const { nombre, rol, activo, password } = req.body;
+  const { nombre, usuario, rol, activo, password, modulos } = req.body;
   try {
+    // Build dynamic SET clause with only provided fields
+    const fields = [];
+    const values = [];
+    let i = 1;
+    if (nombre    !== undefined) { fields.push(`nombre=$${i++}`);        values.push(nombre); }
+    if (usuario   !== undefined) { fields.push(`usuario=$${i++}`);       values.push(usuario); }
+    if (rol       !== undefined) { fields.push(`rol=$${i++}`);           values.push(rol); }
+    if (activo    !== undefined) { fields.push(`activo=$${i++}`);        values.push(activo); }
+    if (modulos   !== undefined) { fields.push(`modulos=$${i++}`);       values.push(modulos); }
     if (password) {
       const hash = await bcrypt.hash(password, 10);
-      await pool.query(
-        'UPDATE usuarios SET nombre=$1, rol=$2, activo=$3, password_hash=$4, updated_at=NOW() WHERE id=$5',
-        [nombre, rol, activo, hash, id]
-      );
-    } else {
-      await pool.query(
-        'UPDATE usuarios SET nombre=$1, rol=$2, activo=$3, updated_at=NOW() WHERE id=$4',
-        [nombre, rol, activo, id]
-      );
+      fields.push(`password_hash=$${i++}`);
+      values.push(hash);
     }
+    if (fields.length === 0) return res.json({ ok: true });
+    fields.push(`updated_at=NOW()`);
+    values.push(id);
+    await pool.query(
+      `UPDATE usuarios SET ${fields.join(',')} WHERE id=$${i}`,
+      values
+    );
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
