@@ -6,13 +6,14 @@ const pool = require('../db/pool');
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
-  const { usuario, password } = req.body;
-  if (!usuario || !password) {
+  const { email, usuario, password } = req.body;
+  const login = email || usuario; // acepta ambos campos
+  if (!login || !password) {
     return res.status(400).json({ error: 'Usuario y contraseña requeridos' });
   }
   try {
     const result = await pool.query(
-      'SELECT * FROM usuarios WHERE usuario = $1 AND activo = true', [usuario]
+      'SELECT * FROM usuarios WHERE usuario = $1 AND activo = true', [login]
     );
     if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
