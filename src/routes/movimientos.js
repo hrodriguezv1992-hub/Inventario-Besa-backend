@@ -3,15 +3,17 @@ const router = express.Router();
 const pool = require('../db/pool');
 const { authMiddleware } = require('../middleware/auth');
 
-// GET /api/movimientos?fecha=2026-06-02&tipo=venta
+// GET /api/movimientos?fecha=2026-06-02&tipo=venta&desde=2026-06-01&hasta=2026-06-30
 router.get('/', authMiddleware, async (req, res) => {
-  const { fecha, tipo } = req.query;
+  const { fecha, tipo, desde, hasta } = req.query;
   try {
     let q = 'SELECT * FROM movimientos WHERE 1=1';
     const params = [];
-    if (fecha) { params.push(fecha); q += ` AND fecha=$${params.length}`; }
-    if (tipo)  { params.push(tipo);  q += ` AND tipo=$${params.length}`; }
-    q += ' ORDER BY created_at';
+    if (fecha)  { params.push(fecha);  q += ` AND fecha=$${params.length}`; }
+    if (tipo)   { params.push(tipo);   q += ` AND tipo=$${params.length}`; }
+    if (desde)  { params.push(desde);  q += ` AND fecha>=$${params.length}`; }
+    if (hasta)  { params.push(hasta);  q += ` AND fecha<=$${params.length}`; }
+    q += ' ORDER BY fecha, created_at';
     const result = await pool.query(q, params);
     res.json(result.rows);
   } catch (err) {
