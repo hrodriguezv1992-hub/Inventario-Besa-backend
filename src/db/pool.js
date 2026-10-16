@@ -8,7 +8,7 @@ connString = connString.replace(':5432/', ':6543/');
 
 const pool = new Pool({
   connectionString: connString,
-  ssl: { rejectUnauthorized: true },
+  ssl: { rejectUnauthorized: false }, // Supabase transaction pooler (6543) usa cert self-signed
   max: 10
 });
 
