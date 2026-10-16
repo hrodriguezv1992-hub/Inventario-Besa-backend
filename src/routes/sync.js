@@ -20,10 +20,19 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
+// Claves permitidas en shared_data — cualquier otra es rechazada
+const CLAVES_PERMITIDAS = new Set([
+  'prods', 'dd', 'listas-compra', 'listas-venta',
+  'pte-liquidar', 'log', 'equiv', 'ordenes',
+]);
+
 // PUT /api/sync/:key — guardar un dato compartido
 router.put('/:key', authMiddleware, async (req, res) => {
   try {
     const key = req.params.key;
+    if (!CLAVES_PERMITIDAS.has(key)) {
+      return res.status(400).json({ error: `Clave no permitida: ${key}` });
+    }
     const value = JSON.stringify(req.body.value);
 
     await pool.query(`
