@@ -8,7 +8,7 @@ connString = connString.replace(':5432/', ':6543/');
 
 const pool = new Pool({
   connectionString: connString,
-  ssl: { rejectUnauthorized: false },
+  ssl: { rejectUnauthorized: true },
   max: 10
 });
 
