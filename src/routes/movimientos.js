@@ -75,6 +75,20 @@ router.put('/:id', authMiddleware, adminOnly, async (req, res) => {
   }
 });
 
+// DELETE /api/movimientos/fecha - eliminar todos los movimientos de una fecha+tipo
+router.delete('/fecha', authMiddleware, adminOnly, async (req, res) => {
+  const { fecha, tipo } = req.body;
+  if (!fecha || !tipo) return res.status(400).json({ error: 'fecha y tipo requeridos' });
+  try {
+    const result = await pool.query(
+      'DELETE FROM movimientos WHERE fecha=$1 AND tipo=$2', [fecha, tipo]
+    );
+    res.json({ ok: true, deleted: result.rowCount });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // DELETE /api/movimientos/grupo/:grupo - eliminar factura completa
 router.delete('/grupo/:grupo', authMiddleware, adminOnly, async (req, res) => {
   const { grupo } = req.params;
