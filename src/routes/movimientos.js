@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/pool');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, adminOnly } = require('../middleware/auth');
 
 // GET /api/movimientos?fecha=2026-06-02&tipo=venta&desde=2026-06-01&hasta=2026-06-30
 router.get('/', authMiddleware, async (req, res) => {
@@ -22,7 +22,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // POST /api/movimientos/batch - guardar múltiples movimientos (reemplaza los del día+tipo)
-router.post('/batch', authMiddleware, async (req, res) => {
+router.post('/batch', authMiddleware, adminOnly, async (req, res) => {
   const { fecha, tipo, items, confirmado, grupo_importacion } = req.body;
   if (!fecha || !tipo || !Array.isArray(items)) {
     return res.status(400).json({ error: 'fecha, tipo e items requeridos' });
@@ -61,7 +61,7 @@ router.post('/batch', authMiddleware, async (req, res) => {
 });
 
 // PUT /api/movimientos/:id - editar un movimiento individual
-router.put('/:id', authMiddleware, async (req, res) => {
+router.put('/:id', authMiddleware, adminOnly, async (req, res) => {
   const { id } = req.params;
   const { cantidad, folio } = req.body;
   try {
@@ -76,7 +76,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 });
 
 // DELETE /api/movimientos/grupo/:grupo - eliminar factura completa
-router.delete('/grupo/:grupo', authMiddleware, async (req, res) => {
+router.delete('/grupo/:grupo', authMiddleware, adminOnly, async (req, res) => {
   const { grupo } = req.params;
   try {
     await pool.query('DELETE FROM movimientos WHERE grupo_importacion=$1', [grupo]);
@@ -87,7 +87,7 @@ router.delete('/grupo/:grupo', authMiddleware, async (req, res) => {
 });
 
 // POST /api/movimientos/confirmar - confirmar movimientos de un tipo+fecha
-router.post('/confirmar', authMiddleware, async (req, res) => {
+router.post('/confirmar', authMiddleware, adminOnly, async (req, res) => {
   const { fecha, tipo } = req.body;
   try {
     await pool.query(
