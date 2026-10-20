@@ -1,10 +1,15 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const pool = require('./db/pool');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Seguridad: headers HTTP
+app.use(helmet());
 
 // Middleware
 app.use(cors({
@@ -18,6 +23,16 @@ app.use(cors({
   allowedHeaders: ['Content-Type','Authorization'],
 }));
 app.use(express.json({ limit: '10mb' }));
+
+// Rate limiting general — 200 requests por IP cada 15 minutos
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Demasiadas solicitudes, intenta en unos minutos' },
+});
+app.use('/api/', generalLimiter);
 
 // Rutas
 app.use('/api/auth',         require('./routes/auth'));
