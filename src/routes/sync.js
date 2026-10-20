@@ -22,8 +22,12 @@ router.get('/', authMiddleware, async (req, res) => {
 
 // Claves permitidas en shared_data — cualquier otra es rechazada
 const CLAVES_PERMITIDAS = new Set([
-  'prods', 'dd', 'listas-compra', 'listas-venta',
-  'pte-liquidar', 'log', 'equiv', 'equivDB', 'ordenes',
+  'prods', 'dd',
+  'listas-compra', 'listas-venta',   // nombres viejos (por si acaso)
+  'listasC', 'listasV',              // nombres reales del frontend
+  'pte-liquidar', 'pteLiquidar',     // ambas variantes
+  'log', 'equiv', 'equivDB',
+  'ordenes', 'users',
 ]);
 
 // PUT /api/sync/:key — guardar un dato compartido
