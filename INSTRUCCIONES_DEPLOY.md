@@ -33,9 +33,11 @@ En Railway → tu proyecto → "Variables" → agregar:
 
 | Variable | Valor |
 |---|---|
-| DATABASE_URL | postgresql://postgres:Intermilan10!!@db.dzjepcbatqosghrfgbkn.supabase.co:5432/postgres |
-| JWT_SECRET | inventapro_jwt_secret_2024_muy_seguro_xK9mP2nQ8rL5vW3 |
+| DATABASE_URL | (tu URL de Supabase — encuéntrala en Supabase → Project Settings → Database → Connection string) |
+| JWT_SECRET | (genera una clave larga y aleatoria, ej. con: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`) |
 | NODE_ENV | production |
+
+> ⚠️ Nunca escribas las credenciales reales en este archivo. Están en Railway como variables de entorno.
 
 5. Railway hace el deploy automático
 6. Te da una URL tipo: `https://inventapro-backend-production.up.railway.app`
