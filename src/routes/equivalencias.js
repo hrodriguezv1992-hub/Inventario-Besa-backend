@@ -28,11 +28,16 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 });
 
-// DELETE /api/equivalencias/:id
+// DELETE /api/equivalencias/:id  (id numérico o nombre_xml codificado)
 router.delete('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query('DELETE FROM equivalencias WHERE id=$1', [id]);
+    // Si es numérico, borrar por id; si no, borrar por nombre_xml
+    if (/^\d+$/.test(id)) {
+      await pool.query('DELETE FROM equivalencias WHERE id=$1', [Number(id)]);
+    } else {
+      await pool.query('DELETE FROM equivalencias WHERE nombre_xml=$1', [decodeURIComponent(id)]);
+    }
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
